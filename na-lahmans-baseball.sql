@@ -62,3 +62,31 @@ SELECT
     sa.cs
 FROM steal_attempts sa
 JOIN people p ON sa.playerid = p.playerid;
+
+-- 10. Find all players who hit their career highest number of home runs in 2016. 
+-- Consider only players who have played in the league for at least 10 years, and who hit at least one home run in 2016. 
+-- Report the players' first and last names and the number of home runs they hit in 2016.
+
+WITH career_hr AS (
+    -- Get the maximum HR in any year for each player
+    SELECT playerid, MAX(HR) AS max_career_hr
+    FROM batting
+    GROUP BY playerid
+),
+player_10_years AS (
+    -- Get players who have played at least 10 years
+    SELECT playerid
+    FROM batting
+    GROUP BY playerid
+    HAVING COUNT(DISTINCT yearID) >= 10
+)
+SELECT 
+    p.nameFirst || ' ' || p.nameLast AS player_name,
+    b.HR AS hr_2016
+FROM batting b
+JOIN career_hr ch ON b.playerid = ch.playerid
+JOIN player_10_years py ON b.playerid = py.playerid
+JOIN people p ON b.playerid = p.playerid
+WHERE b.yearID = 2016
+  AND b.HR > 0  -- Only consider players who hit at least 1 HR in 2016
+  AND b.HR = ch.max_career_hr;  -- Only include players whose 2016 HR count is their highest ever
