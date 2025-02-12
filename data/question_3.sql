@@ -19,7 +19,8 @@ INNER JOIN player_id as pi
 USING (playerid))
 
 SELECT pl.namefirst, pl.namelast, 
-SUM(sa.salary) AS total_salary 
+-- to_char(SUM(sa.salary), 'FM$999,999,999D00') AS total_salary 
+SUM(sa.salary) AS total_salary
 FROM salaries AS sa
 INNER JOIN players AS pl
 USING(playerid)
